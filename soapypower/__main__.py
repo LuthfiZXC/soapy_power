@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import os, sys, logging, argparse, re, shutil, textwrap
+import math
 
+sys.path.append(os.path.dirname(__file__))
 import simplesoapy
 from soapypower import writer
 from soapypower.version import __version__
@@ -274,6 +276,20 @@ def setup_argument_parser():
 
     return parser
 
+def nearest_bins( bins, even=False, pow2=False):
+        """Return nearest number of FFT bins (even or power of two)"""
+        if pow2:
+            bins_log2 = math.log(bins, 2)
+            if bins_log2 % 1 != 0:
+                bins = 2**math.ceil(bins_log2)
+                logger.warning('number of FFT bins should be power of two, changing to {}'.format(bins))
+        elif even:
+            if bins % 2 != 0:
+                bins = math.ceil(bins / 2) * 2
+                logger.warning('number of FFT bins should be even, changing to {}'.format(bins))
+
+        return bins
+
 
 def main():
     # Parse command line arguments
@@ -294,7 +310,7 @@ def main():
     )
 
     # Import soapypower.power module only after setting log level
-    from soapypower import power
+    import power
 
     # Detect SoapySDR devices
     if args.detect:
@@ -313,7 +329,16 @@ def main():
         power.psd.simplespectral.use_pyfftw = False
 
     # Create SoapyPower instance
+    if args.bin_size:
+        args.bins = math.ceil(args.rate / args.bin_size)
+    args.bins = nearest_bins(args.bins, even=args.even, pow2=args.pow2)
+
+    #auto change sample rate based on bin * bin size
+    args.rate = args.bin_size * args.bins
+    # print(args.bin_size, args.bins, args.rate) 
+    
     try:
+
         sdr = power.SoapyPower(
             soapy_args=args.device, sample_rate=args.rate, bandwidth=args.bandwidth, corr=args.ppm,
             gain=args.specific_gains if args.specific_gains else args.gain, auto_gain=args.agc,
@@ -329,11 +354,6 @@ def main():
     # Prepare arguments for SoapyPower.sweep()
     if len(args.freq) < 2:
         args.freq = [args.freq[0], args.freq[0]]
-
-    if args.bin_size:
-        args.bins = sdr.bin_size_to_bins(args.bin_size)
-
-    args.bins = sdr.nearest_bins(args.bins, even=args.even, pow2=args.pow2)
 
     if args.endless:
         args.runs = 0
@@ -370,7 +390,7 @@ def main():
         remove_dc=args.remove_dc, detrend=args.detrend if args.detrend != 'none' else None,
         lnb_lo=args.lnb_lo, tune_delay=args.tune_delay, reset_stream=args.reset_stream,
         base_buffer_size=args.buffer_size, max_buffer_size=args.max_buffer_size,
-        max_threads=args.max_threads, max_queue_size=args.max_queue_size
+        max_threads=args.max_threads, max_queue_size=args.max_queue_size, bin_size = args.bin_size
     )
 
 
