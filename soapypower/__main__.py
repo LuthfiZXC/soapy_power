@@ -310,7 +310,7 @@ def main():
     )
 
     # Import soapypower.power module only after setting log level
-    import power
+    from soapypower import power
 
     # Detect SoapySDR devices
     if args.detect:
