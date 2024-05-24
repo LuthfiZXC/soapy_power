@@ -86,8 +86,6 @@ class SoapyPower:
 
     def bins_to_bin_size(self, bins):
         """Convert number of FFT bins to bin size [Hz]"""
-        # self.device.sample_rate = bins * 
-        # print(self.device)
         return self.device.sample_rate / bins
 
     def time_to_repeats(self, bins, integration_time):
@@ -275,7 +273,7 @@ class SoapyPower:
 
     def sweep(self, min_freq, max_freq, bins, repeats, runs=0, time_limit=0, overlap=0,
               fft_window='hann', fft_overlap=0.5, crop=False, log_scale=True, remove_dc=False, detrend=None, lnb_lo=0,
-              tune_delay=0, reset_stream=False, base_buffer_size=0, max_buffer_size=0, max_threads=0, max_queue_size=0, bin_size = 0):
+              tune_delay=0, reset_stream=False, base_buffer_size=0, max_buffer_size=0, max_threads=0, max_queue_size=0):
         """Sweep spectrum using frequency hopping"""
         self.setup(
             bins, repeats, base_buffer_size, max_buffer_size,
@@ -285,9 +283,6 @@ class SoapyPower:
         )
 
         try:
-            print('aaaa',bin_size)
-            self.device.sample_rate = bin_size * bins
-            print(self.device.sample_rate)
             freq_list = self.freq_plan(min_freq - lnb_lo, max_freq - lnb_lo, bins, overlap)
             t_start = time.time()
             run = 0
