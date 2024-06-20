@@ -390,7 +390,7 @@ def main():
         remove_dc=args.remove_dc, detrend=args.detrend if args.detrend != 'none' else None,
         lnb_lo=args.lnb_lo, tune_delay=args.tune_delay, reset_stream=args.reset_stream,
         base_buffer_size=args.buffer_size, max_buffer_size=args.max_buffer_size,
-        max_threads=args.max_threads, max_queue_size=args.max_queue_size, bin_size = args.bin_size
+        max_threads=args.max_threads, max_queue_size=args.max_queue_size
     )
 
 
