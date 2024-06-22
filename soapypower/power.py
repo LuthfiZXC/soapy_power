@@ -6,7 +6,7 @@ import numpy
 import simplesoapy
 from simplespectral import zeros
 
-from soapypower import psd, writer
+import psd, writer
 
 logger = logging.getLogger(__name__)
 _shutdown = False
@@ -328,3 +328,4 @@ class SoapyPower:
             self.stop()
             t_stop = time.time()
             logger.info('Total time: {:.3f} s'.format(t_stop - t_start))
+            logger.info('DONE')

@@ -4,7 +4,7 @@ import sys, logging, struct, collections, io
 
 import numpy
 
-from soapypower import threadpool
+import threadpool
 
 if sys.platform == 'win32':
     import msvcrt
@@ -106,8 +106,10 @@ class SoapyPowerBinWriter(BaseWriter):
         try:
             # Wait for result of future
             f_array, pwr_array = psd_data_or_future.result()
+            pwr_array = numpy.round(pwr_array,2)
         except AttributeError:
             f_array, pwr_array = psd_data_or_future
+            pwr_array = numpy.round(pwr_array,2)
 
         try:
             step = f_array[1] - f_array[0]
@@ -140,8 +142,10 @@ class RtlPowerFftwWriter(BaseWriter):
         try:
             # Wait for result of future
             f_array, pwr_array = psd_data_or_future.result()
+            pwr_array = numpy.round(pwr_array,2)
         except AttributeError:
             f_array, pwr_array = psd_data_or_future
+            pwr_array = numpy.round(pwr_array,2)
 
         self.output.write('# soapy_power output\n')
         self.output.write('# Acquisition start: {}\n'.format(time_start))
@@ -172,9 +176,11 @@ class RtlPowerWriter(BaseWriter):
         try:
             # Wait for result of future
             f_array, pwr_array = psd_data_or_future.result()
+            pwr_array = numpy.round(pwr_array,2)
         except AttributeError:
             f_array, pwr_array = psd_data_or_future
-
+            pwr_array = numpy.round(pwr_array,2)
+        
         try:
             step = f_array[1] - f_array[0]
             row = [
@@ -182,7 +188,8 @@ class RtlPowerWriter(BaseWriter):
                 f_array[0], f_array[-1] + step, step, samples
             ]
             row += list(pwr_array)
-            self.output.write('{}\n'.format(', '.join(str(x) for x in row)))
+            print(row)
+            # self.output.write('{}\n'.format(', '.join(str(x) for x in row)))
             self.output.flush()
         except Exception as e:
             logging.exception('Error writing to output file:')

@@ -5,8 +5,10 @@ import math
 
 sys.path.append(os.path.dirname(__file__))
 import simplesoapy
-from soapypower import writer
-from soapypower.version import __version__
+# from soapypower import writer
+# from soapypower.version import __version__
+import writer
+from version import __version__
 
 logger = logging.getLogger(__name__)
 re_float_with_multiplier = re.compile(r'(?P<num>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)(?P<multi>[kMGT])?')
@@ -310,7 +312,7 @@ def main():
     )
 
     # Import soapypower.power module only after setting log level
-    from soapypower import power
+    import power
 
     # Detect SoapySDR devices
     if args.detect:
@@ -329,11 +331,16 @@ def main():
         power.psd.simplespectral.use_pyfftw = False
 
     # Create SoapyPower instance
+    print(args.bins)
     if args.bin_size:
         args.bins = math.ceil(args.rate / args.bin_size)
+    else:
+        args.bin_size = 25
     args.bins = nearest_bins(args.bins, even=args.even, pow2=args.pow2)
 
     #auto change sample rate based on bin * bin size
+    print(args.bins)
+    print(args.bin_size)
     args.rate = args.bin_size * args.bins
     # print(args.bin_size, args.bins, args.rate) 
     
